@@ -1,0 +1,9 @@
+<resources>
+    <color name="bg_dark">#09090B</color>
+    <color name="emerald_500">#10B981</color>
+    <color name="emerald_400">#34D399</color>
+    <color name="cyan_400">#22D3EE</color>
+    <color name="zinc_900">#18181B</color>
+    <color name="zinc_800">#27272A</color>
+    <color name="zinc_100">#F4F4F5</color>
+</resources>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BongoLive AI</string>
+    <string name="accessibility_service_description">BongoLive AI (MYRA) সার্বজনীন অটোমেশন সার্ভিস - ব্যবহারকারীর মৌখিক নির্দেশে স্ক্রল, টাইপ ও যেকোনো অ্যাপ স্বয়ংক্রিয়ভাবে পরিচালনা করতে সক্ষম।</string>
+</resources>
