@@ -67,36 +67,40 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
+          gradle-version: '8.10.2'
+          build-root-directory: android
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
 
       - name: Make Gradlew Executable
         run: |
-          cd android
-          if [ -f "gradlew" ]; then
-            chmod +x gradlew
-          else
-            echo "::warning::gradlew not found, ensuring gradle executable wrapper"
+          if [ -f "android/gradlew" ]; then
+            chmod +x android/gradlew
           fi
 
       - name: Build Android Debug APK
         id: gradle_build
+        working-directory: android
         run: |
-          cd android
           echo "=== Starting Gradle Debug Build ==="
-          if [ -f "./gradlew" ]; then
-            ./gradlew :app:assembleDebug --stacktrace --scan --no-daemon
+          if [ -f "./gradlew" ] && [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "Running via local gradlew..."
+            ./gradlew :app:assembleDebug --stacktrace --no-daemon
           else
-            gradle :app:assembleDebug --stacktrace --scan --no-daemon
+            echo "Running via Gradle CLI..."
+            gradle :app:assembleDebug --stacktrace --no-daemon
           fi
 
       - name: Discover and Validate Generated APK
@@ -153,8 +157,6 @@ jobs:
       - name: Generate Build Summary Report
         if: always()
         run: |
-          APK_STATUS="${{ steps.gradle_build.outcome == 'success' && steps.apk_discovery.outcome == 'success' && 'SUCCESS' || 'FAILED' }}"
-          
           cat << 'EOF' >> "$GITHUB_STEP_SUMMARY"
           # 🚀 JARVIS7 ANDROID BUILD
 
