@@ -1,5 +1,5 @@
 {
-  "name": "BongoLive AI - Real-time Bengali Voice & Screen Assistant",
+  "name": "BongoLive AI",
   "description": "Zero-latency real-time Bengali conversational voice assistant with live screen sharing, speech interruption, live captions, and customizable Gemini Live AI settings.",
   "requestFramePermissions": ["camera", "microphone", "display-capture"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
