@@ -6,7 +6,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
+import com.bongolive.ai.data.local.dao.ExecutionLogDao
+import com.bongolive.ai.service.autonomous.AutonomousTaskController
 import com.bongolive.ai.ui.screens.chat.ChatScreen
+import com.bongolive.ai.ui.screens.diagnostics.DeviceDiagnosticsScreen
+import com.bongolive.ai.ui.screens.diagnostics.ExecutionLogScreen
 import com.bongolive.ai.ui.screens.home.HomeScreen
 import com.bongolive.ai.ui.screens.live.LiveVoiceOrbDialog
 import com.bongolive.ai.ui.screens.news.NewsModalSheet
@@ -19,12 +23,18 @@ fun AppNavHost(
     homeViewModel: HomeViewModel,
     chatViewModel: ChatViewModel,
     settingsViewModel: SettingsViewModel,
+    diagnosticsViewModel: DiagnosticsViewModel,
+    executionLogDao: ExecutionLogDao,
+    autonomousTaskController: AutonomousTaskController,
     isLiveConnected: Boolean,
     assistantCaption: String,
     userCaption: String,
     onStartLiveVoice: () -> Unit,
     onStopLiveVoice: () -> Unit,
-    onInterruptLiveVoice: () -> Unit
+    onInterruptLiveVoice: () -> Unit,
+    onRequestMediaProjection: () -> Unit,
+    onRequestOverlayPermission: () -> Unit,
+    onRequestAccessibilitySettings: () -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -35,10 +45,12 @@ fun AppNavHost(
 
     val newsList by homeViewModel.newsList.collectAsState()
     val isLoadingNews by homeViewModel.isLoadingNews.collectAsState()
+    val customApiKey by settingsViewModel.customApiKey.collectAsState()
 
     val screens = listOf(
         Screen.Home,
         Screen.Chat,
+        Screen.Diagnostics,
         Screen.Settings
     )
 
@@ -85,7 +97,9 @@ fun AppNavHost(
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            enterTransition = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(200)) },
+            exitTransition = { androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(200)) }
         ) {
             composable(Screen.Home.route) {
                 HomeScreen(
@@ -116,6 +130,21 @@ fun AppNavHost(
                 )
             }
 
+            composable(Screen.Diagnostics.route) {
+                DeviceDiagnosticsScreen(
+                    viewModel = diagnosticsViewModel,
+                    hasApiKey = customApiKey.isNotBlank(),
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ExecutionLogs.route) {
+                ExecutionLogScreen(
+                    executionLogDao = executionLogDao,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
             composable(Screen.Settings.route) {
                 SettingsScreen(settingsViewModel = settingsViewModel)
             }
@@ -140,7 +169,6 @@ fun AppNavHost(
             newsList = newsList,
             isLoading = isLoadingNews,
             onReadNews = { readText ->
-                // Speaks or sends to chat
                 chatViewModel.sendMessage(readText)
             },
             onClose = { isNewsSheetOpen = false }

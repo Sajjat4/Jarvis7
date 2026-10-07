@@ -11,16 +11,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bongolive.ai.ui.theme.*
 import com.bongolive.ai.ui.viewmodel.SettingsViewModel
+import com.bongolive.ai.utils.PermissionManager
 
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel
 ) {
+    val context = LocalContext.current
     val customKey by settingsViewModel.customApiKey.collectAsState()
     val useCustomKey by settingsViewModel.useCustomApiKey.collectAsState()
     val liveModel by settingsViewModel.liveModel.collectAsState()
@@ -208,7 +211,7 @@ fun SettingsScreen(
             }
         }
 
-        // Accessibility Service Section
+        // Android System Permissions & Settings Section
         item {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
@@ -216,29 +219,66 @@ fun SettingsScreen(
                 color = SurfaceDark,
                 border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "অ্যাক্সেসিবিলিটি অটোমেশন",
-                            color = TextPrimary,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "স্ক্রিন দেখে স্বয়ংক্রিয় স্ক্রল, অ্যাপ লঞ্চ ও টাইপিং অনুমতি",
-                            color = TextSecondary,
-                            fontSize = 11.sp
-                        )
-                    }
-                    Switch(
-                        checked = accessibilityEnabled,
-                        onCheckedChange = { settingsViewModel.setAccessibilityEnabled(it) },
-                        colors = SwitchDefaults.colors(checkedThumbColor = Emerald400, checkedTrackColor = EmeraldGlow)
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Android সিস্টেম পারমিশন ও সেটিংস",
+                        color = TextPrimary,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
                     )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // 1. Accessibility Service settings redirect
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { PermissionManager.openAccessibilitySettings(context) }
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = "অ্যাক্সেসিবিলিটি সার্ভিস সেটিংস", color = TextPrimary, fontSize = 13.sp)
+                            Text(text = "Android সেটিংসে গিয়ে MYRA অটোমেশন চালু করুন", color = TextSecondary, fontSize = 11.sp)
+                        }
+                        Icon(imageVector = Icons.Default.OpenInNew, contentDescription = null, tint = Emerald400, modifier = Modifier.size(18.dp))
+                    }
+
+                    Divider(color = SurfaceBorder, thickness = 0.5.dp)
+
+                    // 2. Display Over Other Apps (Floating overlay)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { PermissionManager.openOverlaySettings(context) }
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = "অন্যান্য অ্যাপের উপরে প্রদর্শন (ফ্লোটিং সহকারী)", color = TextPrimary, fontSize = 13.sp)
+                            Text(text = "যেকোনো অ্যাপ ব্যবহারকালে ফ্লোটিং অ্যাসিস্ট্যান্ট আইকন প্রদর্শন", color = TextSecondary, fontSize = 11.sp)
+                        }
+                        Icon(imageVector = Icons.Default.OpenInNew, contentDescription = null, tint = Cyan400, modifier = Modifier.size(18.dp))
+                    }
+
+                    Divider(color = SurfaceBorder, thickness = 0.5.dp)
+
+                    // 3. Application Details Settings
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { PermissionManager.openAppSettings(context) }
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = "অ্যাপের সার্বিক পারমিশন ও স্টোরেজ", color = TextPrimary, fontSize = 13.sp)
+                            Text(text = "মাইক্রোফোন, নোটিফিকেশন ও ব্যাটারি অপ্টিমাইজেশন", color = TextSecondary, fontSize = 11.sp)
+                        }
+                        Icon(imageVector = Icons.Default.OpenInNew, contentDescription = null, tint = TextTertiary, modifier = Modifier.size(18.dp))
+                    }
                 }
             }
         }

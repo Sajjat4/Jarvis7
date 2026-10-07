@@ -2,66 +2,92 @@ package com.bongolive.ai.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bongolive.ai.data.local.PreferencesDataStore
+import com.bongolive.ai.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val preferencesDataStore: PreferencesDataStore
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    val customApiKey = preferencesDataStore.customApiKeyFlow.stateIn(
+    init {
+        viewModelScope.launch {
+            settingsRepository.restoreFromRoomIfExists()
+        }
+    }
+
+    val customApiKey = settingsRepository.customApiKey.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), ""
     )
 
-    val useCustomApiKey = preferencesDataStore.useCustomApiKeyFlow.stateIn(
+    val useCustomApiKey = settingsRepository.useCustomApiKey.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), false
     )
 
-    val liveModel = preferencesDataStore.liveModelFlow.stateIn(
+    val liveModel = settingsRepository.liveModel.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "gemini-3.8-live"
     )
 
-    val chatModel = preferencesDataStore.chatModelFlow.stateIn(
+    val chatModel = settingsRepository.chatModel.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "gemini-3.5-flash"
     )
 
-    val voiceName = preferencesDataStore.voiceNameFlow.stateIn(
+    val voiceName = settingsRepository.voiceName.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), "Kore"
     )
 
-    val accessibilityEnabled = preferencesDataStore.accessibilityEnabledFlow.stateIn(
+    val accessibilityEnabled = settingsRepository.accessibilityEnabled.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), true
+    )
+
+    val speechRate = settingsRepository.speechRate.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 1.0f
+    )
+
+    val enableCaptions = settingsRepository.enableCaptions.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), true
     )
 
     fun saveApiKey(key: String, useCustom: Boolean) {
         viewModelScope.launch {
-            preferencesDataStore.saveApiKey(key, useCustom)
+            settingsRepository.saveApiKey(key, useCustom)
         }
     }
 
     fun saveLiveModel(model: String) {
         viewModelScope.launch {
-            preferencesDataStore.saveLiveModel(model)
+            settingsRepository.saveLiveModel(model)
         }
     }
 
     fun saveChatModel(model: String) {
         viewModelScope.launch {
-            preferencesDataStore.saveChatModel(model)
+            settingsRepository.saveChatModel(model)
         }
     }
 
     fun saveVoiceName(voice: String) {
         viewModelScope.launch {
-            preferencesDataStore.saveVoiceName(voice)
+            settingsRepository.saveVoiceName(voice)
         }
     }
 
     fun setAccessibilityEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            preferencesDataStore.setAccessibilityEnabled(enabled)
+            settingsRepository.setAccessibilityEnabled(enabled)
+        }
+    }
+
+    fun setSpeechRate(rate: Float) {
+        viewModelScope.launch {
+            settingsRepository.setSpeechRate(rate)
+        }
+    }
+
+    fun setCaptionsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setCaptionsEnabled(enabled)
         }
     }
 }

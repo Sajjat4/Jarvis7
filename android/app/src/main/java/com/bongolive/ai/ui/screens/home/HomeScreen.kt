@@ -56,7 +56,7 @@ fun HomeScreen(
             desc = "স্ক্রিন দেখে তাত্ক্ষণিক সাহায্য ও অটোমেশন",
             icon = Icons.Default.Screenshot,
             iconColor = Cyan400,
-            badge = "অটো-ডিভাইস",
+            badge = "MediaProjection",
             onClick = onStartLiveVoice
         ),
         QuickActionItem(

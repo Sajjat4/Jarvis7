@@ -1,7 +1,9 @@
 package com.bongolive.ai.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -9,5 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Home : Screen("home", "হোম", Icons.Default.Home)
     object Chat : Screen("chat", "চ্যাট", Icons.Default.Chat)
+    object Diagnostics : Screen("diagnostics", "ডায়াগনস্টিক", Icons.Default.HealthAndSafety)
     object Settings : Screen("settings", "সেটিংস", Icons.Default.Settings)
+    object ExecutionLogs : Screen("execution_logs", "এক্সিকিউশন লগ", Icons.Default.Assessment)
 }
